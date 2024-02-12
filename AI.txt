@@ -1,0 +1,508 @@
+[4:36 am, 12/02/2024] Arsh: #AIM: Implement A* search.
+dict_hn={'Arad':336,'Bucharest':0,'Craiova':160,'Drobeta':242,'Eforie':161,
+         'Fagaras':176,'Giurgiu':77,'Hirsova':151,'Iasi':226,'Lugoj':244,
+         'Mehadia':241,'Neamt':234,'Oradea':380,'Pitesti':100,'Rimnicu':193,
+         'Sibiu':253,'Timisoara':329,'Urziceni':80,'Vaslui':199,'Zerind':374}
+
+dict_gn=dict(
+Arad=dict(Zerind=75,Timisoara=118,Sibiu=140),
+Bucharest=dict(Urziceni=85,Giurgiu=90,Pitesti=101,Fagaras=211),
+Craiova=dict(Drobeta=120,Pitesti=138,Rimnicu=146),
+Drobeta=dict(Mehadia=75,Craiova=120),
+Eforie=dict(Hirsova=86),
+Fagaras=dict(Sibiu=99,Bucharest=211),
+Giurgiu=dict(Bucharest=90),
+Hirsova=dict(Eforie=86,Urziceni=98),
+Iasi=dict(Neamt=87,Vaslui=92),
+Lugoj=dict(Mehadia=70,Timisoara=111),
+Mehadia=dict(Lugoj=70,Drobeta=75),
+Neamt=dict(Iasi=87),
+Oradea=dict(Zerind=71,Sibiu=151),
+Pitesti=dict(Rimnicu=97,Bucharest=101,Craiova=138),
+Rimnicu=dict(Sibiu=80,Pitesti=97,Craiova=146),
+Sibiu=dict(Rimnicu=80,Fagaras=99,Arad=140,Oradea=151),
+Timisoara=dict(Lugoj=111,Arad=118),
+Urziceni=dict(Bucharest=85,Hirsova=98,Vaslui=142),
+Vaslui=dict(Iasi=92,Urziceni=142),
+Zerind=dict(Oradea=71,Arad=75)
+)
+import queue as Q
+#from RMP import dict_gn
+#from RMP import dict_hn
+
+start='Arad'
+goal='Bucharest'
+result=''
+
+def get_fn(citystr):
+    cities=citystr.split(" , ")
+    hn=gn=0
+    for ctr in range(0, len(cities)-1):
+        gn=gn+dict_gn[cities[ctr]][cities[ctr+1]]
+    hn=dict_hn[cities[len(cities)-1]]
+    return(hn+gn)
+
+def expand(cityq):
+    global result
+    tot, citystr, thiscity=cityq.get()
+    if thiscity==goal:
+        result=citystr+" : : "+str(tot)
+        return
+    for cty in dict_gn[thiscity]:
+        cityq.put((get_fn(citystr+" , "+cty), citystr+" , "+cty, cty))
+    expand(cityq)
+
+def main():
+    cityq=Q.PriorityQueue()
+    thiscity=start
+    cityq.put((get_fn(start),start,thiscity))
+    expand(cityq)
+    print("The A* path with the total is: ")
+    print(result)
+
+main()
+
+"""
+OUTPUT:
+The A* path with the total is: 
+Arad , Sibiu , Rimnicu , Pitesti , Bucharest : : 418
+"""
+[4:37 am, 12/02/2024] Arsh: Astar
+[4:38 am, 12/02/2024] Arsh: dict_hn={'Arad':336,'Bucharest':0,'Craiova':160,'Drobeta':242,'Eforie':161,
+         'Fagaras':176,'Giurgiu':77,'Hirsova':151,'Iasi':226,'Lugoj':244,
+         'Mehadia':241,'Neamt':234,'Oradea':380,'Pitesti':100,'Rimnicu':193,
+         'Sibiu':253,'Timisoara':329,'Urziceni':80,'Vaslui':199,'Zerind':374}
+
+dict_gn=dict(
+Arad=dict(Zerind=75,Timisoara=118,Sibiu=140),
+Bucharest=dict(Urziceni=85,Giurgiu=90,Pitesti=101,Fagaras=211),
+Craiova=dict(Drobeta=120,Pitesti=138,Rimnicu=146),
+Drobeta=dict(Mehadia=75,Craiova=120),
+Eforie=dict(Hirsova=86),
+Fagaras=dict(Sibiu=99,Bucharest=211),
+Giurgiu=dict(Bucharest=90),
+Hirsova=dict(Eforie=86,Urziceni=98),
+Iasi=dict(Neamt=87,Vaslui=92),
+Lugoj=dict(Mehadia=70,Timisoara=111),
+Mehadia=dict(Lugoj=70,Drobeta=75),
+Neamt=dict(Iasi=87),
+Oradea=dict(Zerind=71,Sibiu=151),
+Pitesti=dict(Rimnicu=97,Bucharest=101,Craiova=138),
+Rimnicu=dict(Sibiu=80,Pitesti=97,Craiova=146),
+Sibiu=dict(Rimnicu=80,Fagaras=99,Arad=140,Oradea=151),
+Timisoara=dict(Lugoj=111,Arad=118),
+Urziceni=dict(Bucharest=85,Hirsova=98,Vaslui=142),
+Vaslui=dict(Iasi=92,Urziceni=142),
+Zerind=dict(Oradea=71,Arad=75)
+)
+import queue as Q
+#from RMP import dict_hn
+
+start='Arad'
+goal='Bucharest'
+result=''
+
+def BFS(city, cityq, visitedq):
+    global result
+    if city==start:
+        result=result+' '+city
+    for eachcity in dict_gn[city].keys():
+        if eachcity==goal:
+            result=result+' '+eachcity
+            return
+        if eachcity not in cityq.queue and eachcity not in visitedq.queue:
+            cityq.put(eachcity)
+            result=result+' '+eachcity
+    visitedq.put(city)
+    BFS(cityq.get(),cityq,visitedq)
+
+def main():
+    cityq=Q.Queue()
+    visitedq=Q.Queue()
+    BFS(start, cityq, visitedq)
+    print("BFS Traversal from ",start," to ",goal," is: ")
+    print(result)
+    
+main()
+
+"""
+OUTPUT:
+BFS Traversal from  Arad  to  Bucharest  is: 
+ Arad Timisoara Zerind Sibiu Lugoj Oradea Fagaras Rimnicu Mehadia Bucharest
+"""
+[4:38 am, 12/02/2024] Arsh: Bfs1
+[4:40 am, 12/02/2024] Arsh: class NaiveBayes:
+    def _init_(self, f, r):
+        self.features = f
+        self.response = r
+
+    def predict(self,custcase):
+        anskeys = list(self.response.keys())
+        ansvalues = dict.fromkeys(anskeys,0)
+        #print(custcase)
+        for key in anskeys :
+            ansvalues[key] = self.response[key]
+            
+            for ikey, ival in custcase.items() :
+                ansvalues[key] = ansvalues[key] * self.features[ikey][ival][key]
+
+        print(ansvalues)
+
+        #calculating MAP
+        maxkey=""
+        maxans=-1
+        for ikey, ival in ansvalues.items():
+            if ival > maxans :
+                maxans= ival
+                maxkey = ikey
+        return maxkey
+        
+        
+#precalculated values from worksheet - "naive bayes classifier working"
+response = {"Wait":0.4, "Leave":0.6}
+
+features = {
+    "Reservation":
+                    {
+                        "Yes" : {"Wait":0.5, "Leave":0.666667},
+                         "No" : {"Wait":0.5, "Leave":0.333333}
+                    } ,
+    "Time>30":
+                    {
+                        "Yes" : {"Wait":0.25, "Leave":0.83333},
+                         "No" : {"Wait":0.75, "Leave":0.16667}
+                    }                  
+}
+
+
+
+nb = NaiveBayes(features, response)
+
+#print("Probability :", nb.features["Reservation"]["Yes"]["Wait"])
+#print("Probability :", nb.features["Time>30"]["No"]["Leave"])
+
+resstatus = input("Manager asks Customer, have you reserved table?(Yes/No):")
+timestatus = input("Customer asks Manager, Will it take more than 30 mins?(Yes/No):")
+
+custcase = {"Reservation":resstatus, "Time>30":timestatus}
+
+print("Manager predicts that Customer will :" , nb.predict(custcase) )
+[4:40 am, 12/02/2024] Arsh: Naivebayes
+[4:41 am, 12/02/2024] Arsh: from tkinter import*
+import phonenumbers
+from phonenumbers import carrier
+from phonenumbers import geocoder
+from phonenumbers import timezone
+from timezonefinder import TimezoneFinder
+from geopy.geocoders import Nominatim
+from datetime import datetime
+import pytz
+
+root=Tk()
+root.title("Phone Number Tracker")
+root.geometry("365x584+200+100")
+root.resizable(False,False)
+
+def track():
+	entry_number=entry.get()
+	number=phonenumbers.parse(entry_number)
+	# country
+	locate=geocoder.description_for_number(number, 'en')
+	country.config(text=locate)
+	# operator 
+	operator=carrier.name_for_number(number, 'en')
+	sim.config(text=operator)
+	# Phone Timezone
+	time=timezone.time_zones_for_number(number)
+	zone.config(text=time)
+	# logitude and latitude 
+	geolocator=Nominatim(user_agent="geoapiExercises")
+	location=geolocator.geocode(locate)
+
+	lng=location.longitude
+	lat=location.latitude
+	longitude.config(text=lng)
+	latitude.config(text=lat)
+
+	# time showing in phone
+	obj=TimezoneFinder()
+	result=obj.timezone_at(lng=location.longitude,lat=location.latitude)
+
+	home=pytz.timezone(result)
+	local_time=datetime.now(home)
+	current_time=local_time.strftime("%I:%M:%p")
+	clock.config(text=current_time)
+
+	
+# logo
+logo=PhotoImage(file="Images/logoimage.png")
+Label(root,image=logo).place(x=240,y=70)
+
+Heading=Label(root,text="TRACK NUMBERS",font=("arial",15,"bold"))
+Heading.place(x=84,y=110)
+
+# Entry
+Entry_back=PhotoImage(file="Images/search png.png")
+Label(root,image=Entry_back).place(x=20,y=190)
+
+
+entry=StringVar()
+entry_number=Entry(root,textvariable=entry,width=19,font=("arial",18,"bold"),bd=0,justify="center")
+entry_number.place(x=57,y=222)
+
+# Button
+Search_image=PhotoImage(file="Images/search.png")
+Search=Button(root,image=Search_image,borderwidth=0,cursor="hand2",font=("arial",16),command=track)
+Search.place(x=35,y=300)
+
+# Button Box
+Box=PhotoImage(file="Images/bottom png.png")
+Label(root,image=Box).place(x=-2,y=355)
+
+country=Label(root,text="Country:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+country.place(x=50,y=400)
+
+sim=Label(root,text="SIM:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+sim.place(x=200,y=400)
+
+zone=Label(root,text="TimeZone:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+zone.place(x=50,y=450)
+
+clock=Label(root,text="Phone Time:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+clock.place(x=200,y=450)
+
+longitude=Label(root,text="Longitude:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+longitude.place(x=50,y=500)
+
+latitude=Label(root,text="Latitude:",bg="#57adff",fg="black",font=("arial",10,"bold"))
+latitude.place(x=200,y=500)
+
+root.mainloop()
+[4:41 am, 12/02/2024] Arsh: Phone number details
+[4:42 am, 12/02/2024] Arsh: #501(prac2)----27/06/19----
+#AIM: Implement IDDFS(Iterative Deepening Depth-First Search).
+dict_hn={'Arad':336,'Bucharest':0,'Craiova':160,'Drobeta':242,'Eforie':161,
+         'Fagaras':176,'Giurgiu':77,'Hirsova':151,'Iasi':226,'Lugoj':244,
+         'Mehadia':241,'Neamt':234,'Oradea':380,'Pitesti':100,'Rimnicu':193,
+         'Sibiu':253,'Timisoara':329,'Urziceni':80,'Vaslui':199,'Zerind':374}
+
+dict_gn=dict(
+Arad=dict(Zerind=75,Timisoara=118,Sibiu=140),
+Bucharest=dict(Urziceni=85,Giurgiu=90,Pitesti=101,Fagaras=211),
+Craiova=dict(Drobeta=120,Pitesti=138,Rimnicu=146),
+Drobeta=dict(Mehadia=75,Craiova=120),
+Eforie=dict(Hirsova=86),
+Fagaras=dict(Sibiu=99,Bucharest=211),
+Giurgiu=dict(Bucharest=90),
+Hirsova=dict(Eforie=86,Urziceni=98),
+Iasi=dict(Neamt=87,Vaslui=92),
+Lugoj=dict(Mehadia=70,Timisoara=111),
+Mehadia=dict(Lugoj=70,Drobeta=75),
+Neamt=dict(Iasi=87),
+Oradea=dict(Zerind=71,Sibiu=151),
+Pitesti=dict(Rimnicu=97,Bucharest=101,Craiova=138),
+Rimnicu=dict(Sibiu=80,Pitesti=97,Craiova=146),
+Sibiu=dict(Rimnicu=80,Fagaras=99,Arad=140,Oradea=151),
+Timisoara=dict(Lugoj=111,Arad=118),
+Urziceni=dict(Bucharest=85,Hirsova=98,Vaslui=142),
+Vaslui=dict(Iasi=92,Urziceni=142),
+Zerind=dict(Oradea=71,Arad=75)
+)
+import queue as Q
+#from RMP import dict_hn
+
+start='Arad'
+goal='Bucharest'
+result=''
+
+def DLS(city, visitedstack, startlimit, endlimit):
+    global result
+    found=0
+    result=result+city+' '
+    visitedstack.append(city)
+    if city==goal:
+        return 1
+    if startlimit==endlimit:
+        return 0
+    for eachcity in dict_gn[city].keys():
+        if eachcity not in visitedstack:
+            found=DLS(eachcity, visitedstack, startlimit+1, endlimit)
+            if found:
+                return found
+
+def IDDFS(city, visitedstack, endlimit):
+    global result
+    for i in range(0, endlimit):
+        print("Searching at Limit: ",i)
+        found=DLS(city, visitedstack, 0, i)
+        if found:
+            print("Found")
+            break
+        else:
+            print("Not Found! ")
+            print(result)
+            print("-----")
+            result=' '
+            visitedstack=[]
+
+def main():
+    visitedstack=[]
+    IDDFS(start, visitedstack, 9)
+    print("IDDFS Traversal from ",start," to ", goal," is: ")
+    print(result)
+
+
+main()            
+
+
+"""
+OUTPUT:
+Searching at Limit:  0
+Not Found! 
+Arad 
+-----
+Searching at Limit:  1
+Not Found! 
+ Arad Zerind Sibiu Timisoara 
+-----
+Searching at Limit:  2
+Not Found! 
+ Arad Zerind Oradea Sibiu Rimnicu Fagaras Timisoara Lugoj 
+-----
+Searching at Limit:  3
+Not Found! 
+ Arad Zerind Oradea Sibiu Timisoara Lugoj Mehadia 
+-----
+Searching at Limit:  4
+Not Found! 
+ Arad Zerind Oradea Sibiu Rimnicu Fagaras Timisoara Lugoj Mehadia Drobeta 
+-----
+Searching at Limit:  5
+Found
+IDDFS Traversal from  Arad  to  Bucharest  is: 
+ Arad Zerind Oradea Sibiu Rimnicu Pitesti Craiova Fagaras Bucharest 
+"""
+[4:43 am, 12/02/2024] Arsh: Iddfs
+[4:44 am, 12/02/2024] Arsh: #AIM: RBFS(Recursive Breadth First Search)
+dict_hn={'Arad':336,'Bucharest':0,'Craiova':160,'Drobeta':242,'Eforie':161,
+         'Fagaras':176,'Giurgiu':77,'Hirsova':151,'Iasi':226,'Lugoj':244,
+         'Mehadia':241,'Neamt':234,'Oradea':380,'Pitesti':100,'Rimnicu':193,
+         'Sibiu':253,'Timisoara':329,'Urziceni':80,'Vaslui':199,'Zerind':374}
+
+dict_gn=dict(
+Arad=dict(Zerind=75,Timisoara=118,Sibiu=140),
+Bucharest=dict(Urziceni=85,Giurgiu=90,Pitesti=101,Fagaras=211),
+Craiova=dict(Drobeta=120,Pitesti=138,Rimnicu=146),
+Drobeta=dict(Mehadia=75,Craiova=120),
+Eforie=dict(Hirsova=86),
+Fagaras=dict(Sibiu=99,Bucharest=211),
+Giurgiu=dict(Bucharest=90),
+Hirsova=dict(Eforie=86,Urziceni=98),
+Iasi=dict(Neamt=87,Vaslui=92),
+Lugoj=dict(Mehadia=70,Timisoara=111),
+Mehadia=dict(Lugoj=70,Drobeta=75),
+Neamt=dict(Iasi=87),
+Oradea=dict(Zerind=71,Sibiu=151),
+Pitesti=dict(Rimnicu=97,Bucharest=101,Craiova=138),
+Rimnicu=dict(Sibiu=80,Pitesti=97,Craiova=146),
+Sibiu=dict(Rimnicu=80,Fagaras=99,Arad=140,Oradea=151),
+Timisoara=dict(Lugoj=111,Arad=118),
+Urziceni=dict(Bucharest=85,Hirsova=98,Vaslui=142),
+Vaslui=dict(Iasi=92,Urziceni=142),
+Zerind=dict(Oradea=71,Arad=75)
+)
+import queue as Q
+
+
+start='Arad'
+goal='Bucharest'
+result=''
+
+def get_fn(citystr):
+    cities=citystr.split(',')
+    hn=gn=0
+    for ctr in range(0,len(cities)-1):
+        gn=gn+dict_gn[cities[ctr]][cities[ctr+1]]
+    hn=dict_hn[cities[len(cities)-1]]
+    return(hn+gn)
+
+def printout(cityq):
+    for i in range(0,cityq.qsize()):
+        print(cityq.queue[i])
+
+def expand(cityq):
+    global result
+    tot,citystr,thiscity=cityq.get()
+    nexttot=999
+    if not cityq.empty():
+        nexttot,nextcitystr,nextthiscity=cityq.queue[0]
+    if thiscity==goal and tot<nexttot:
+        result=citystr+'::'+str(tot)
+        return
+    print("Expanded city------------------------------",thiscity)
+    print("Second best f(n)------------------------------",nexttot)
+    tempq=Q.PriorityQueue()
+    for cty in dict_gn[thiscity]:
+            tempq.put((get_fn(citystr+','+cty),citystr+','+cty,cty))
+    for ctr in range(1,3):
+        ctrtot,ctrcitystr,ctrthiscity=tempq.get()
+        if ctrtot<nexttot:
+            cityq.put((ctrtot,ctrcitystr,ctrthiscity))
+        else:
+            cityq.put((ctrtot,citystr,thiscity))
+            break
+    printout(cityq)
+    expand(cityq)
+def main():
+    cityq=Q.PriorityQueue()
+    thiscity=start
+    cityq.put((999,"NA","NA"))
+    cityq.put((get_fn(start),start,thiscity))
+    expand(cityq)
+    print(result)
+main()
+              
+              
+"""
+OUTPUT:
+Expanded city------------------------------ Arad
+Second best f(n)------------------------------ 999
+(393, 'Arad,Sibiu', 'Sibiu')
+(999, 'NA', 'NA')
+(447, 'Arad,Timisoara', 'Timisoara')
+Expanded city------------------------------ Sibiu
+Second best f(n)------------------------------ 447
+(413, 'Arad,Sibiu,Rimnicu', 'Rimnicu')
+(415, 'Arad,Sibiu,Fagaras', 'Fagaras')
+(447, 'Arad,Timisoara', 'Timisoara')
+(999, 'NA', 'NA')
+Expanded city------------------------------ Rimnicu
+Second best f(n)------------------------------ 415
+(415, 'Arad,Sibiu,Fagaras', 'Fagaras')
+(417, 'Arad,Sibiu,Rimnicu', 'Rimnicu')
+(447, 'Arad,Timisoara', 'Timisoara')
+(999, 'NA', 'NA')
+Expanded city------------------------------ Fagaras
+Second best f(n)------------------------------ 417
+(417, 'Arad,Sibiu,Rimnicu', 'Rimnicu')
+(450, 'Arad,Sibiu,Fagaras', 'Fagaras')
+(447, 'Arad,Timisoara', 'Timisoara')
+(999, 'NA', 'NA')
+Expanded city------------------------------ Rimnicu
+Second best f(n)------------------------------ 447
+(417, 'Arad,Sibiu,Rimnicu,Pitesti', 'Pitesti')
+(447, 'Arad,Timisoara', 'Timisoara')
+(999, 'NA', 'NA')
+(450, 'Arad,Sibiu,Fagaras', 'Fagaras')
+(526, 'Arad,Sibiu,Rimnicu', 'Rimnicu')
+Expanded city------------------------------ Pitesti
+Second best f(n)------------------------------ 447
+(418, 'Arad,Sibiu,Rimnicu,Pitesti,Bucharest', 'Bucharest')
+(447, 'Arad,Timisoara', 'Timisoara')
+(607, 'Arad,Sibiu,Rimnicu,Pitesti', 'Pitesti')
+(526, 'Arad,Sibiu,Rimnicu', 'Rimnicu')
+(450, 'Arad,Sibiu,Fagaras', 'Fagaras')
+(999, 'NA', 'NA')
+Arad,Sibiu,Rimnicu,Pitesti,Bucharest::418
+"""
+[4:44 am, 12/02/2024] Arsh: Rbfs
